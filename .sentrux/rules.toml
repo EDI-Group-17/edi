@@ -1,0 +1,28 @@
+[architecture]
+# Protect critical AgentShield configuration directories
+protect_paths = [
+    "_bmad/**",
+    ".sentrux/**",
+    ".semgrep/**",
+    "scripts/**"
+]
+
+[architecture.separation_of_concerns]
+# Ensure backend (FastAPI) and frontend (React) are kept separate
+backend_dir = "src/backend"
+frontend_dir = "src/frontend"
+disallow_cross_imports = true
+
+[[rules]]
+name = "no-backend-in-frontend"
+description = "Frontend code should not import backend modules"
+pattern = "import.*backend"
+paths = ["src/frontend/**"]
+severity = "error"
+
+[[rules]]
+name = "no-frontend-in-backend"
+description = "Backend code should not import frontend modules"
+pattern = "import.*frontend"
+paths = ["src/backend/**"]
+severity = "error"
