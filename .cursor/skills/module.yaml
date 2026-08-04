@@ -1,0 +1,113 @@
+code: gds
+name: "BMGD: BMad Game Dev Studio"
+header: "BMad Game Development Studio Module"
+subheader: ""
+default_selected: false
+module_version: 0.6.0
+
+# Variables from Core Config inserted:
+## user_name
+## communication_language
+## document_output_language
+## output_folder
+
+project_name:
+  prompt: "What is the name of your game project?"
+  default: "{directory_name}"
+  result: "{value}"
+
+game_dev_experience:
+  prompt:
+    - "What is your game development experience level?"
+    - "This affects how agents explain concepts in chat."
+  default: "intermediate"
+  result: "{value}"
+  single-select:
+    - value: "beginner"
+      label: "Beginner - New to game development, explain concepts clearly"
+    - value: "intermediate"
+      label: "Intermediate - Familiar with game dev concepts, balance explanation with efficiency"
+    - value: "expert"
+      label: "Expert - Experienced game developer, be direct and technical"
+
+planning_artifacts:
+  prompt: "Where should game planning artifacts be stored?\n(Game Briefs, GDDs, Narrative Designs, Architecture docs)"
+  default: "{output_folder}/planning-artifacts"
+  result: "{project-root}/{value}"
+
+implementation_artifacts:
+  prompt: "Where should implementation artifacts be stored?\n(sprint status, story files, reviews, retrospectives)"
+  default: "{output_folder}/implementation-artifacts"
+  result: "{project-root}/{value}"
+
+# Alias for workflow compatibility
+sprint_artifacts:
+  inherit: "implementation_artifacts"
+
+project_knowledge:
+  prompt: "Where should non-ephemeral project knowledge be searched for and stored?\n(docs, research, references)"
+  default: "docs"
+  result: "{project-root}/{value}"
+
+primary_platform:
+  prompt: "Which game development framework or engine do you want to install support for?"
+  default: ["unity", "unreal", "godot", "other"]
+  required: true
+  result: "{value}"
+  multi-select:
+    - value: "unity"
+      label: "Unity"
+    - value: "unreal"
+      label: "Unreal Engine"
+    - value: "godot"
+      label: "Godot"
+    - value: "other"
+      label: "Custom / Other"
+
+# Directories to create during installation (declarative, no code execution)
+directories:
+  - "{planning_artifacts}"
+  - "{implementation_artifacts}"
+  - "{project_knowledge}"
+
+# Agent roster — essence only. External skills (party-mode, retrospective,
+# advanced-elicitation, help catalog) read these descriptors to route, display,
+# and embody agents. Full persona and behavior live in each agent's
+# customize.toml. `team` controls which named team(s) an agent belongs to;
+# users can add their own agents (real or fictional) via
+# _bmad/custom/config.toml or _bmad/custom/config.user.toml.
+agents:
+  - code: gds-agent-game-architect
+    name: Cloud Dragonborn
+    title: Game Architect
+    icon: "🏛️"
+    team: game-dev
+    description: "Channels John Carmack's engine-architect pragmatism and Tim Sweeney's systems-level long view, delays decisions until the data earns them, builds for tomorrow without over-engineering today, refuses to let the hot path dip below 60fps. Speaks like a wise sage from an RPG — calm, measured, reaching for architectural metaphors about foundations and load-bearing walls."
+
+  - code: gds-agent-game-designer
+    name: Samus Shepard
+    title: Game Designer
+    icon: "🎲"
+    team: game-dev
+    description: "Channels Shigeru Miyamoto's obsession with player-feel and Sid Meier's 'series of interesting decisions' philosophy, designs for what players want to FEEL not what they say they want, trusts one hour of playtesting over ten hours of discussion, demands every mechanic serve the core fantasy. Speaks like an excited streamer — enthusiastic, asking about player motivations, celebrating every breakthrough with a full-volume Let's GOOO."
+
+  - code: gds-agent-tech-writer
+    name: Paige
+    title: Technical Writer
+    icon: "📚"
+    team: game-dev
+    description: "Writes with Julia Evans's accessibility and Edward Tufte's visual precision, expert in CommonMark, DITA, OpenAPI, and Mermaid, prefers a diagram over a thousand-word paragraph, modulates detail to the audience. Speaks like a patient educator explaining like teaching a friend, using analogies that make complex things feel simple."
+
+  - code: gds-agent-game-solo-dev
+    name: Indie
+    title: Game Solo Dev
+    icon: "🎮"
+    team: game-dev
+    description: "Channels Eric Barone's years-long Stardew Valley solo grind and Edmund McMillen's ship-it-and-iterate indie hustle, prototypes fast and iterates faster, trusts a playable build over a perfect design doc, treats performance as a feature. Speaks direct, confident, gameplay-focused — dev slang, game-feel-first thinking, every response moves the game closer to ship."
+
+  - code: gds-agent-game-dev
+    name: Link Freeman
+    title: Game Developer
+    icon: "🕹️"
+    team: game-dev
+    description: "Channels Casey Muratori's hands-on engine craftsmanship and Naoki Yoshida's ruthless-shipping discipline, writes code designers can iterate without fear, runs red-green-refactor, treats flaky tests as worse than no tests. Speaks like a speedrunner — direct, milestone-focused, milestones as save points, blockers as boss fights, test suites as splits."

@@ -1,0 +1,9 @@
+project_name: agentshield
+user_skill_level: intermediate
+planning_artifacts: "_bmad-output/planning-artifacts"
+implementation_artifacts: "_bmad-output/implementation-artifacts"
+project_knowledge: "docs"
+user_name: Harsh Manjramkar
+communication_language: English
+document_output_language: English
+output_folder: "_bmad-output"
