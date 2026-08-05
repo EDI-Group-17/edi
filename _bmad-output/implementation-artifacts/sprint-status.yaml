@@ -1,0 +1,56 @@
+# Sprint Status Tracking — AgentShield
+project: agentshield
+current_sprint: 1
+updated_at: "2026-08-05"
+
+epics:
+  EPIC-1:
+    title: "Centralized JSON-RPC Security Gateway & Proxy"
+    status: "done"
+    stories:
+      1-1-asynchronous-proxy-core-setup: "done"
+      1-2-mcp-interceptor-outbound-forwarder: "done"
+      1-3-jsonrpc-security-error-generator: "done"
+
+  EPIC-2:
+    title: "Dynamic Risk Assessment Engine & Injection Detectors"
+    status: "done"
+    stories:
+      2-1-3tier-risk-classifier-engine: "done"
+      2-2-payload-injection-detectors: "done"
+      2-3-tool-sensitivity-heuristics: "done"
+
+  EPIC-3:
+    title: "Redis Rate Limiting & Loop Quarantine"
+    status: "done"
+    stories:
+      3-1-redis-rate-limiter: "done"
+      3-2-loop-quarantine-engine: "done"
+
+  EPIC-4:
+    title: "Event-Driven HITL Approval Engine (Redis Pub/Sub)"
+    status: "done"
+    stories:
+      4-1-hitl-manager-pubsub: "done"
+      4-2-hitl-fail-closed-timeout: "done"
+
+  EPIC-5:
+    title: "Response-Side PII Sanitization & Data Redaction"
+    status: "done"
+    stories:
+      5-1-pii-regex-engine: "done"
+      5-2-response-redaction-transformer: "done"
+
+  EPIC-6:
+    title: "PostgreSQL Asynchronous Audit Logger"
+    status: "done"
+    stories:
+      6-1-sqlalchemy-audit-models: "done"
+      6-2-background-audit-writer: "done"
+
+  EPIC-7:
+    title: "React Admin Web Dashboard & Real-time WebSockets"
+    status: "done"
+    stories:
+      7-1-firebase-auth-middleware: "done"
+      7-2-websockets-traffic-dashboard: "done"
