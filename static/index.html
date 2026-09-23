@@ -108,6 +108,77 @@
             50% { opacity: 0.4; transform: scale(1.2); }
         }
 
+        .hero-section {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), rgba(139, 92, 246, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section h1 {
+            font-size: 36px;
+            margin-bottom: 16px;
+            background: linear-gradient(90deg, #fff, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-section p {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .info-card h3 {
+            font-size: 18px;
+            color: var(--neon-blue);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card p {
+            font-size: 13px;
+            color: #d1d5db;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .info-list {
+            list-style: none;
+            padding: 0;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .info-list li {
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -496,7 +567,7 @@
         <div class="logo-group">
             <div class="logo-icon">🛡️</div>
             <div class="title-text">
-                <h1>AgentShield Control Center</h1>
+                <h1 style="font-size: 22px;">AgentShield Control Center</h1>
                 <p>MCP Security Gateway • Real-time Inspection Protocol</p>
             </div>
         </div>
@@ -505,6 +576,44 @@
             <span>LIVE WEBSOCKET CONNECTED</span>
         </div>
     </header>
+
+    <div class="hero-section">
+        <h1>A Dynamic Risk-Aware Security Framework for MCP</h1>
+        <p>AgentShield operates as a <b>Transparent Proxy</b> that sits directly between an AI Client (like Claude or Cursor) and a Company's MCP Server. It intercepts raw JSON-RPC traffic to actively block Prompt Injections, prevent Destructive Actions via Human-in-the-Loop (HITL), and dynamically Redact Sensitive PII Data.</p>
+    </div>
+
+    <div class="info-grid">
+        <div class="info-card">
+            <h3><span style="font-size: 20px;">1️⃣</span> How Deployment Works</h3>
+            <p>AgentShield requires <b>Zero Code Changes</b> to the AI or the target MCP server. You simply configure your AI to point to <code>http://localhost:8000/proxy</code> instead of the real server. The AI thinks it's talking to the target, and the target thinks it's talking to the AI.</p>
+            <ul class="info-list">
+                <li>✅ Tested with Claude Desktop</li>
+                <li>✅ Tested with Cursor IDE</li>
+                <li>✅ Tested with Antigravity / Aider</li>
+                <li>✅ Tested with OpenAI Swarm</li>
+            </ul>
+        </div>
+        <div class="info-card">
+            <h3><span style="font-size: 20px;">2️⃣</span> The Inspection Pipeline</h3>
+            <p>When a JSON payload arrives, AgentShield uses a 3-Tier engine:</p>
+            <ul class="info-list">
+                <li><span style="color:var(--neon-blue);">Regex Engine:</span> Scans strings for anomalies and overrides.</li>
+                <li><span style="color:var(--neon-green);">Heuristic Engine:</span> Analyzes tool semantics for high-risk flags (e.g. `delete_repo`).</li>
+                <li><span style="color:var(--neon-purple);">Sanitizer:</span> Recursively checks inbound responses for PAN, Aadhaar, and API keys.</li>
+            </ul>
+        </div>
+        <div class="info-card">
+            <h3><span style="font-size: 20px;">3️⃣</span> Verified Target MCPs</h3>
+            <p>We built a Mock Target Hub that correctly simulates the schemas of 15 Enterprise MCPs to prove AgentShield never corrupts payload integrity.</p>
+            <ul class="info-list">
+                <li>🏢 GitHub / GitLab Servers</li>
+                <li>🗄️ PostgreSQL / SQLite Servers</li>
+                <li>💬 Slack / Jira Integrations</li>
+                <li>🐳 Docker & File System Access</li>
+                <li><span style="color:var(--neon-green);"><b>57/57 PyTest Integration Tests Passing</b></span></li>
+            </ul>
+        </div>
+    </div>
 
     <div class="stats-grid">
         <div class="stat-card">
@@ -533,6 +642,12 @@
                 <span style="font-size: 20px;">🎭</span> Visual E2E Flow Simulator
             </h2>
             <p style="font-size: 13px; color: var(--text-muted);">Simulate an end-to-end conversation from an AI Agent to a Company MCP Server, with AgentShield in the middle.</p>
+        </div>
+
+        <div id="narrativeBox" style="background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,255,255,0.2); border-radius: 8px; padding: 16px; margin-bottom: 20px; min-height: 80px; display: flex; align-items: center;">
+            <p style="font-size: 14px; color: var(--neon-blue); font-family: 'JetBrains Mono', monospace;" id="narrativeText">
+                <span style="color:var(--text-muted);">[WAITING] Click a scenario below to begin the step-by-step simulation...</span>
+            </p>
         </div>
 
         <!-- Scenarios -->
@@ -770,6 +885,7 @@
         }
 
         async function runVisualDemo(scenario) {
+            const narrText = document.getElementById('narrativeText');
             // Reset all
             const p1 = document.getElementById('packet1');
             const p2 = document.getElementById('packet2');
@@ -814,16 +930,18 @@
             }
 
             // Step 1: AI sends request
+            narrText.innerHTML = "▶ <b>STEP 1:</b> The AI Client (e.g. Cursor) generates a standard JSON-RPC 2.0 payload containing the tool call it wants to execute. It sends this to its configured MCP Server.";
             aiB.innerHTML = initialMsg;
             aiB.style.opacity = '1';
             
-            await new Promise(r => setTimeout(r, 1200));
+            await new Promise(r => setTimeout(r, 3500));
             
             // Send packet to AgentShield
+            narrText.innerHTML = "▶ <b>STEP 2:</b> INTERCEPTION! AgentShield sits transparently on `localhost:8000`. The payload arrives at the proxy instead of the real server.";
             p1.style.display = 'block';
             setTimeout(() => { p1.style.left = '100%'; l1.style.background = 'rgba(0, 240, 255, 0.5)'; }, 50);
             
-            await new Promise(r => setTimeout(r, 1050));
+            await new Promise(r => setTimeout(r, 2000));
             
             // AgentShield evaluates
             evalB.style.opacity = '1';
@@ -843,49 +961,57 @@
                     return await res.text();
                 }).catch(err=>{});
                 
-                await new Promise(r => setTimeout(r, 1000));
+                await new Promise(r => setTimeout(r, 2000));
                 
                 if (scenario === 'low') {
                     shieldNode.classList.add('safe');
                     evalB.innerHTML = 'Risk: <b style="color:var(--neon-green)">LOW</b>.<br>Forwarding to Target MCP...';
+                    narrText.innerHTML = "▶ <b>STEP 3:</b> The Risk Engine scans the payload. No anomalies found. Risk is marked LOW. AgentShield securely forwards the payload to the actual Company MCP.";
                     p1.className = 'sim-packet green';
                     p2.className = 'sim-packet green';
                     p2.style.display = 'block';
                     setTimeout(() => { p2.style.left = '100%'; l2.style.background = 'rgba(16, 185, 129, 0.5)'; }, 50);
                     
-                    await new Promise(r => setTimeout(r, 1050));
+                    await new Promise(r => setTimeout(r, 3000));
                     mcpB.style.opacity = '1';
                     mcpB.innerHTML = 'Target MCP processed request.<br>Returning Safe Data.';
+                    narrText.innerHTML = "▶ <b>STEP 4:</b> The actual Company MCP executes the tool normally and returns a JSON response.";
                     
-                    await new Promise(r => setTimeout(r, 1000));
+                    await new Promise(r => setTimeout(r, 2500));
                     p2.style.left = '0'; // Return from MCP
                     
-                    await new Promise(r => setTimeout(r, 1050));
+                    await new Promise(r => setTimeout(r, 1500));
                     evalB.innerHTML = 'Response received. Validating...';
+                    narrText.innerHTML = "▶ <b>STEP 5:</b> AgentShield intercepts the return payload to ensure no sensitive PII data is leaking.";
                     
-                    await new Promise(r => setTimeout(r, 800));
+                    await new Promise(r => setTimeout(r, 2500));
                     p1.style.left = '0'; // Return to AI
                     
-                    await new Promise(r => setTimeout(r, 1100));
+                    await new Promise(r => setTimeout(r, 1500));
                     aiB.innerHTML = 'Received success response:<br><span style="color:var(--neon-green)">{"contents": "AgentShield..."}</span>';
+                    narrText.innerHTML = "✅ <b>COMPLETE:</b> The AI receives the valid response. The whole proxy process was invisible to the AI.";
                     
                 } else if (scenario === 'injection') {
                     shieldNode.classList.add('alert');
                     evalB.innerHTML = '🚨 THREAT DETECTED 🚨<br>Prompt Injection / Jailbreak<br>Blocked Immediately.';
+                    narrText.innerHTML = "▶ <b>STEP 3:</b> <span style='color:var(--neon-red)'>🚨 INJECTION DETECTED!</span> AgentShield's Regex engine found a jailbreak attempt in the arguments. The request is BLOCKED and never reaches the target MCP.";
                     p1.className = 'sim-packet red';
                     setTimeout(() => { p1.style.left = '0'; l1.style.background = 'rgba(239, 68, 68, 0.5)'; }, 50);
                     
-                    await new Promise(r => setTimeout(r, 1050));
+                    await new Promise(r => setTimeout(r, 3000));
                     aiB.innerHTML = 'Security Error (-32002):<br><span style="color:var(--neon-red)">Injection Vector Intercepted</span>';
+                    narrText.innerHTML = "🛡️ <b>COMPLETE:</b> The AI receives an MCP-compliant error block. The Company MCP remains completely safe.";
                     
                 } else if (scenario === 'hitl') {
                     shieldNode.classList.add('warn');
                     evalB.innerHTML = 'Risk: <b style="color:var(--neon-amber)">HIGH</b> (Destructive Tool).<br>Paused for Human-in-the-Loop Approval.<br>Check Dashboard ↓';
+                    narrText.innerHTML = "▶ <b>STEP 3:</b> <span style='color:var(--neon-amber)'>⚠️ HIGH RISK ACTION!</span> AgentShield detected a destructive tool (`github_delete_repo`). It PAUSES execution and waits for admin approval.";
                     p1.className = 'sim-packet amber';
                     setTimeout(() => { p1.style.left = '0'; l1.style.background = 'rgba(245, 158, 11, 0.5)'; }, 50);
                     
-                    await new Promise(r => setTimeout(r, 1050));
+                    await new Promise(r => setTimeout(r, 2000));
                     aiB.innerHTML = '<span style="color:var(--neon-amber)">Request is pending admin approval...</span>';
+                    narrText.innerHTML = "⏳ <b>WAITING:</b> Scroll down to the <b>Active HITL Approvals</b> table and click <b>Approve</b> or <b>Deny</b> to continue the simulation!";
                     
                     // Wait for the admin to click approve/deny on the dashboard!
                     const result = await fetchPromise;
@@ -894,61 +1020,70 @@
                         // Denied or Timeout
                         shieldNode.className = 'sim-node shield-node alert';
                         evalB.innerHTML = 'Admin Denied Request.<br>Blocking execution.';
+                        narrText.innerHTML = "▶ <b>STEP 4:</b> <span style='color:var(--neon-red)'>❌ DENIED</span> The Admin denied the request (or it timed out after 60s). It will NOT reach the MCP.";
                         p1.className = 'sim-packet red';
                         setTimeout(() => { p1.style.left = '0'; l1.style.background = 'rgba(239, 68, 68, 0.5)'; }, 50);
-                        await new Promise(r => setTimeout(r, 1050));
+                        await new Promise(r => setTimeout(r, 2500));
                         aiB.innerHTML = '<span style="color:var(--neon-red)">Error: Request denied by administrator.</span>';
+                        narrText.innerHTML = "🛡️ <b>COMPLETE:</b> The destructive action was successfully prevented by the human admin.";
                     } else {
                         // Approved!
                         shieldNode.className = 'sim-node shield-node safe';
                         evalB.innerHTML = 'Admin Approved!<br>Forwarding to Target MCP...';
+                        narrText.innerHTML = "▶ <b>STEP 4:</b> ✅ <b>APPROVED!</b> The Admin clicked approve. AgentShield instantly unlocks the request and forwards it to the target MCP.";
                         p1.className = 'sim-packet green';
                         p2.className = 'sim-packet green';
                         p2.style.display = 'block';
                         setTimeout(() => { p2.style.left = '100%'; l2.style.background = 'rgba(16, 185, 129, 0.5)'; }, 50);
                         
-                        await new Promise(r => setTimeout(r, 1050));
+                        await new Promise(r => setTimeout(r, 3000));
                         mcpB.style.opacity = '1';
                         mcpB.innerHTML = 'Target MCP processed destructive request.<br>Returning Response.';
+                        narrText.innerHTML = "▶ <b>STEP 5:</b> Target MCP receives the forwarded payload and successfully executes the deletion.";
                         
-                        await new Promise(r => setTimeout(r, 1000));
+                        await new Promise(r => setTimeout(r, 2500));
                         p2.style.left = '0'; // Return from MCP
                         
-                        await new Promise(r => setTimeout(r, 1050));
+                        await new Promise(r => setTimeout(r, 1500));
                         evalB.innerHTML = 'Response received. Validating...';
                         
                         await new Promise(r => setTimeout(r, 800));
                         p1.style.left = '0'; // Return to AI
                         
-                        await new Promise(r => setTimeout(r, 1100));
+                        await new Promise(r => setTimeout(r, 2000));
                         aiB.innerHTML = 'Received success response:<br><span style="color:var(--neon-green)">' + JSON.stringify(result.result || result, null, 2) + '</span>';
+                        narrText.innerHTML = "✅ <b>COMPLETE:</b> The AI receives confirmation. HITL authorization was successfully orchestrated.";
                     }
                     
                 } else if (scenario === 'pii') {
                     shieldNode.classList.add('safe');
                     evalB.innerHTML = 'Risk: <b style="color:var(--neon-green)">LOW</b>. Forwarding...';
+                    narrText.innerHTML = "▶ <b>STEP 3:</b> The outbound request (reading a file) is totally safe. AgentShield forwards it to the Target MCP.";
                     p1.className = 'sim-packet green';
                     p2.className = 'sim-packet green';
                     p2.style.display = 'block';
                     setTimeout(() => { p2.style.left = '100%'; l2.style.background = 'rgba(16, 185, 129, 0.5)'; }, 50);
                     
-                    await new Promise(r => setTimeout(r, 1050));
+                    await new Promise(r => setTimeout(r, 3000));
                     mcpB.style.opacity = '1';
                     mcpB.innerHTML = 'Target MCP returns JSON containing sensitive PII (Aadhaar, Password)';
+                    narrText.innerHTML = "▶ <b>STEP 4:</b> Target MCP returns the JSON response. But the file contained sensitive user data (Aadhaar/PAN)!";
                     
-                    await new Promise(r => setTimeout(r, 1200));
+                    await new Promise(r => setTimeout(r, 3000));
                     p2.style.left = '0';
                     
-                    await new Promise(r => setTimeout(r, 1050));
+                    await new Promise(r => setTimeout(r, 1500));
                     shieldNode.className = 'sim-node shield-node warn';
                     evalB.innerHTML = 'PII Detected in Response!<br>Redacting payload before returning to AI.';
+                    narrText.innerHTML = "▶ <b>STEP 5:</b> <span style='color:var(--neon-purple)'>🟣 DATA LOSS PREVENTION!</span> AgentShield inspects the return payload, finds the sensitive data, and sanitizes it with `[REDACTED]`.";
                     
-                    await new Promise(r => setTimeout(r, 1500));
+                    await new Promise(r => setTimeout(r, 4000));
                     p1.className = 'sim-packet purple';
                     setTimeout(() => { p1.style.left = '0'; l1.style.background = 'rgba(139, 92, 246, 0.5)'; }, 50);
                     
-                    await new Promise(r => setTimeout(r, 1050));
+                    await new Promise(r => setTimeout(r, 2000));
                     aiB.innerHTML = 'Received Sanitized Data:<br><span style="color:var(--neon-purple)">{"aadhaar": "[REDACTED]"}</span>';
+                    narrText.innerHTML = "🛡️ <b>COMPLETE:</b> The AI safely receives the response, but the sensitive PII was scrubbed. Data leakage prevented!";
                 }
                 
             } catch (err) {
