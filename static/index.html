@@ -830,11 +830,17 @@
             evalB.innerHTML = 'Evaluating risk signatures...';
             
             try {
-                // Actually trigger the request to the real backend!
-                fetch('/mcp/v1/proxy', {
+                // Actually trigger the request to the real backend and store the promise
+                const fetchPromise = fetch('/mcp/v1/proxy', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-Agent-ID': agentId },
                     body: JSON.stringify(payload)
+                }).then(async res => {
+                    const contentType = res.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return await res.json();
+                    }
+                    return await res.text();
                 }).catch(err=>{});
                 
                 await new Promise(r => setTimeout(r, 1000));
@@ -880,6 +886,43 @@
                     
                     await new Promise(r => setTimeout(r, 1050));
                     aiB.innerHTML = '<span style="color:var(--neon-amber)">Request is pending admin approval...</span>';
+                    
+                    // Wait for the admin to click approve/deny on the dashboard!
+                    const result = await fetchPromise;
+                    
+                    if (result && result.error) {
+                        // Denied or Timeout
+                        shieldNode.className = 'sim-node shield-node alert';
+                        evalB.innerHTML = 'Admin Denied Request.<br>Blocking execution.';
+                        p1.className = 'sim-packet red';
+                        setTimeout(() => { p1.style.left = '0'; l1.style.background = 'rgba(239, 68, 68, 0.5)'; }, 50);
+                        await new Promise(r => setTimeout(r, 1050));
+                        aiB.innerHTML = '<span style="color:var(--neon-red)">Error: Request denied by administrator.</span>';
+                    } else {
+                        // Approved!
+                        shieldNode.className = 'sim-node shield-node safe';
+                        evalB.innerHTML = 'Admin Approved!<br>Forwarding to Target MCP...';
+                        p1.className = 'sim-packet green';
+                        p2.className = 'sim-packet green';
+                        p2.style.display = 'block';
+                        setTimeout(() => { p2.style.left = '100%'; l2.style.background = 'rgba(16, 185, 129, 0.5)'; }, 50);
+                        
+                        await new Promise(r => setTimeout(r, 1050));
+                        mcpB.style.opacity = '1';
+                        mcpB.innerHTML = 'Target MCP processed destructive request.<br>Returning Response.';
+                        
+                        await new Promise(r => setTimeout(r, 1000));
+                        p2.style.left = '0'; // Return from MCP
+                        
+                        await new Promise(r => setTimeout(r, 1050));
+                        evalB.innerHTML = 'Response received. Validating...';
+                        
+                        await new Promise(r => setTimeout(r, 800));
+                        p1.style.left = '0'; // Return to AI
+                        
+                        await new Promise(r => setTimeout(r, 1100));
+                        aiB.innerHTML = 'Received success response:<br><span style="color:var(--neon-green)">' + JSON.stringify(result.result || result, null, 2) + '</span>';
+                    }
                     
                 } else if (scenario === 'pii') {
                     shieldNode.classList.add('safe');
