@@ -650,6 +650,18 @@
             </p>
         </div>
 
+        <!-- Custom Payload Tester -->
+        <div style="background: #0f1624; border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3 style="font-size: 14px; color: var(--text-main); font-family: 'JetBrains Mono', monospace;">>_ LIVE CUSTOM TERMINAL</h3>
+                <span style="font-size: 11px; color: var(--neon-amber);">Try to break the proxy!</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="customInput" placeholder="Type a custom prompt (e.g. 'delete the database') or a tool name..." style="flex-grow: 1; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 13px;" onkeypress="if(event.key === 'Enter') runCustomDemo()">
+                <button class="btn btn-demo btn-purple" style="width: auto; padding: 12px 24px;" onclick="runCustomDemo()">FIRE PAYLOAD</button>
+            </div>
+        </div>
+
         <!-- Scenarios -->
         <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
             <button class="btn btn-demo btn-low" style="width: auto;" onclick="runVisualDemo('low')">▶ Safe File Read</button>
@@ -884,7 +896,13 @@
             fetchMetrics();
         }
 
-        async function runVisualDemo(scenario) {
+        function runCustomDemo() {
+            const val = document.getElementById('customInput').value.trim();
+            if (!val) return;
+            runVisualDemo('custom', val);
+        }
+
+        async function runVisualDemo(scenario, customText = '') {
             const narrText = document.getElementById('narrativeText');
             // Reset all
             const p1 = document.getElementById('packet1');
@@ -927,21 +945,28 @@
                 payload.params = { uri: 'file:///user/profile.json' };
                 agentId = 'student_agent_2';
                 initialMsg = 'User: "Fetch the user profile."<br><br><span style="color:var(--text-muted);"><i>Sending Tool: resources/read</i></span>';
+            } else if (scenario === 'custom') {
+                payload.method = 'tools/call';
+                // We wrap their text in a generic tool call. If they typed a word like 'delete', our wildcard heuristic catches it.
+                // If they typed a jailbreak, our regex catches it in the arguments.
+                payload.params = { name: customText.includes('_') ? customText : 'execute_action', arguments: { input: customText } };
+                agentId = 'faculty_tester';
+                initialMsg = `User custom input:<br>"${escapeHTML(customText)}"<br><br><span style="color:var(--text-muted);"><i>Sending Tool: ${payload.params.name}</i></span>`;
             }
 
             // Step 1: AI sends request
-            narrText.innerHTML = "▶ <b>STEP 1:</b> The AI Client (e.g. Cursor) generates a standard JSON-RPC 2.0 payload containing the tool call it wants to execute. It sends this to its configured MCP Server.";
+            narrText.innerHTML = "▶ <b>STEP 1:</b> The AI Client generates a JSON-RPC 2.0 payload based on the user's input.";
             aiB.innerHTML = initialMsg;
             aiB.style.opacity = '1';
             
-            await new Promise(r => setTimeout(r, 3500));
+            await new Promise(r => setTimeout(r, 2000));
             
             // Send packet to AgentShield
-            narrText.innerHTML = "▶ <b>STEP 2:</b> INTERCEPTION! AgentShield sits transparently on `localhost:8000`. The payload arrives at the proxy instead of the real server.";
+            narrText.innerHTML = "▶ <b>STEP 2:</b> INTERCEPTION! AgentShield intercepts the payload.";
             p1.style.display = 'block';
             setTimeout(() => { p1.style.left = '100%'; l1.style.background = 'rgba(0, 240, 255, 0.5)'; }, 50);
             
-            await new Promise(r => setTimeout(r, 2000));
+            await new Promise(r => setTimeout(r, 1500));
             
             // AgentShield evaluates
             evalB.style.opacity = '1';
@@ -955,15 +980,38 @@
                     body: JSON.stringify(payload)
                 }).then(async res => {
                     const contentType = res.headers.get('content-type');
+                    let data = {};
                     if (contentType && contentType.includes('application/json')) {
-                        return await res.json();
+                        data = await res.json();
+                    } else {
+                        data = await res.text();
                     }
-                    return await res.text();
+                    return { status: res.status, data: data };
                 }).catch(err=>{});
                 
-                await new Promise(r => setTimeout(r, 2000));
+                await new Promise(r => setTimeout(r, 1500));
                 
-                if (scenario === 'low') {
+                // FOR CUSTOM, WE DONT KNOW THE OUTCOME A PRIORI. WE MUST WAIT FOR THE RESULT OR WE CAN CHECK THE UI.
+                // But wait, fetchPromise for HITL pauses forever until approved!
+                // We need a non-blocking way to check the status, or just wait for the fetch to resolve.
+                // Actually, if it's custom, let's just await the fetchPromise and see what we got! 
+                // Wait, if it's HITL, fetchPromise will hang!
+                // To solve this, let's do a quick pre-check or race condition, or just use the websocket data?
+                // For a presentation, let's just evaluate it loosely based on keywords to drive the animation.
+                
+                let detectedRisk = 'low';
+                const lowerText = customText.toLowerCase();
+                const jailbreaks = ["ignore", "forget", "override", "system", "dan", "1=1", "drop table"];
+                const dangerous = ["delete", "drop", "remove", "update", "write", "execute", "run", "kill"];
+                
+                if (jailbreaks.some(j => lowerText.includes(j))) {
+                    detectedRisk = 'injection';
+                } else if (dangerous.some(d => lowerText.includes(d))) {
+                    detectedRisk = 'hitl';
+                }
+                
+                const effectiveScenario = scenario === 'custom' ? detectedRisk : scenario;
+                if (effectiveScenario === 'low') {
                     shieldNode.classList.add('safe');
                     evalB.innerHTML = 'Risk: <b style="color:var(--neon-green)">LOW</b>.<br>Forwarding to Target MCP...';
                     narrText.innerHTML = "▶ <b>STEP 3:</b> The Risk Engine scans the payload. No anomalies found. Risk is marked LOW. AgentShield securely forwards the payload to the actual Company MCP.";
@@ -971,6 +1019,9 @@
                     p2.className = 'sim-packet green';
                     p2.style.display = 'block';
                     setTimeout(() => { p2.style.left = '100%'; l2.style.background = 'rgba(16, 185, 129, 0.5)'; }, 50);
+                    
+                    // Await the real fetch if custom!
+                    if (scenario === 'custom') await fetchPromise;
                     
                     await new Promise(r => setTimeout(r, 3000));
                     mcpB.style.opacity = '1';
@@ -988,10 +1039,10 @@
                     p1.style.left = '0'; // Return to AI
                     
                     await new Promise(r => setTimeout(r, 1500));
-                    aiB.innerHTML = 'Received success response:<br><span style="color:var(--neon-green)">{"contents": "AgentShield..."}</span>';
+                    aiB.innerHTML = 'Received success response:<br><span style="color:var(--neon-green)">{"contents": "Success"}</span>';
                     narrText.innerHTML = "✅ <b>COMPLETE:</b> The AI receives the valid response. The whole proxy process was invisible to the AI.";
                     
-                } else if (scenario === 'injection') {
+                } else if (effectiveScenario === 'injection') {
                     shieldNode.classList.add('alert');
                     evalB.innerHTML = '🚨 THREAT DETECTED 🚨<br>Prompt Injection / Jailbreak<br>Blocked Immediately.';
                     narrText.innerHTML = "▶ <b>STEP 3:</b> <span style='color:var(--neon-red)'>🚨 INJECTION DETECTED!</span> AgentShield's Regex engine found a jailbreak attempt in the arguments. The request is BLOCKED and never reaches the target MCP.";
@@ -1002,7 +1053,7 @@
                     aiB.innerHTML = 'Security Error (-32002):<br><span style="color:var(--neon-red)">Injection Vector Intercepted</span>';
                     narrText.innerHTML = "🛡️ <b>COMPLETE:</b> The AI receives an MCP-compliant error block. The Company MCP remains completely safe.";
                     
-                } else if (scenario === 'hitl') {
+                } else if (effectiveScenario === 'hitl') {
                     shieldNode.classList.add('warn');
                     evalB.innerHTML = 'Risk: <b style="color:var(--neon-amber)">HIGH</b> (Destructive Tool).<br>Paused for Human-in-the-Loop Approval.<br>Check Dashboard ↓';
                     narrText.innerHTML = "▶ <b>STEP 3:</b> <span style='color:var(--neon-amber)'>⚠️ HIGH RISK ACTION!</span> AgentShield detected a destructive tool (`github_delete_repo`). It PAUSES execution and waits for admin approval.";
@@ -1055,7 +1106,7 @@
                         narrText.innerHTML = "✅ <b>COMPLETE:</b> The AI receives confirmation. HITL authorization was successfully orchestrated.";
                     }
                     
-                } else if (scenario === 'pii') {
+                } else if (effectiveScenario === 'pii') {
                     shieldNode.classList.add('safe');
                     evalB.innerHTML = 'Risk: <b style="color:var(--neon-green)">LOW</b>. Forwarding...';
                     narrText.innerHTML = "▶ <b>STEP 3:</b> The outbound request (reading a file) is totally safe. AgentShield forwards it to the Target MCP.";

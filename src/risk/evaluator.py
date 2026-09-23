@@ -30,11 +30,16 @@ def evaluate_mcp_risk(payload: dict[str, Any]) -> Tuple[str, str]:
 
     # 5. Check tool invocations
     if method == "tools/call":
-        tool_name = params.get("name", "")
+        tool_name = params.get("name", "").lower()
         if tool_name in settings.HIGH_RISK_TOOLS:
-            if tool_name in {"fs.write_file", "fs.delete_file", "github.delete_repo", "db.execute_sql", "shell.execute", "exec"}:
-                return "HIGH", f"SENSITIVE_TOOL_MUTATION: Tool '{tool_name}' requires HITL approval"
             return "HIGH", f"SENSITIVE_TOOL_CALL: Configured sensitive tool '{tool_name}'"
+            
+        # GENERALIZED HEURISTIC: Catch any tool containing dangerous keywords
+        dangerous_keywords = ["delete", "drop", "remove", "update", "write", "execute", "run", "kill", "terminate", "format", "create"]
+        for kw in dangerous_keywords:
+            if kw in tool_name:
+                return "HIGH", f"GENERALIZED_HEURISTIC: Tool '{tool_name}' contains sensitive keyword '{kw}'"
+                
         return "MEDIUM", f"STANDARD_TOOL_EXECUTION: Tool '{tool_name}'"
 
     return "MEDIUM", "DEFAULT_FAIL_SAFE_MEDIUM_RISK"
