@@ -1,3 +1,0 @@
-agent_id,agent_name,agent_description,agent_type,agent_instructions,agent_tools,agent_workspace,agent_phase,agent_next_agent,agent_requires_human_approval,agent_output_dir,agent_output_file
-bmm,bmad-platinum-story-delivery,Platinum epic delivery,PL,Runbook L0-L5 VB waves,read,agentshield,4-build,bmad-create-story,,false,_bmad-output/planning-artifacts,{epic-id}-platinum-runbook.md
-bmm,bmad-agent-rock,Rock platinum orchestrator,RO,Composes skills per runbook; token economy,read,agentshield,4-build,,,false,.claude/skills/bmad-agent-rock/SKILL.md,
