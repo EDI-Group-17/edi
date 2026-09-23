@@ -1067,7 +1067,7 @@
                     // Wait for the admin to click approve/deny on the dashboard!
                     const result = await fetchPromise;
                     
-                    if (result && result.error) {
+                    if (result && (result.status !== 200 || (result.data && result.data.error))) {
                         // Denied or Timeout
                         shieldNode.className = 'sim-node shield-node alert';
                         evalB.innerHTML = 'Admin Denied Request.<br>Blocking execution.';
@@ -1102,7 +1102,8 @@
                         p1.style.left = '0'; // Return to AI
                         
                         await new Promise(r => setTimeout(r, 2000));
-                        aiB.innerHTML = 'Received success response:<br><span style="color:var(--neon-green)">' + JSON.stringify(result.result || result, null, 2) + '</span>';
+                        const displayData = result && result.data ? (result.data.result || result.data) : result;
+                        aiB.innerHTML = 'Received success response:<br><span style="color:var(--neon-green)">' + JSON.stringify(displayData, null, 2) + '</span>';
                         narrText.innerHTML = "✅ <b>COMPLETE:</b> The AI receives confirmation. HITL authorization was successfully orchestrated.";
                     }
                     
