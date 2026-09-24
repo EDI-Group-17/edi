@@ -17,7 +17,7 @@ class QuarantineReleaseRequest(BaseModel):
 @router.get("/metrics")
 async def get_admin_metrics() -> Dict[str, Any]:
     pending = hitl_manager.get_pending_requests()
-    quarantined = loop_detector.get_quarantined_agents()
+    quarantined = loop_detector.get_quarantined_agents_detailed()
     fallback_logs = audit_logger.get_fallback_records()
     return {
         "pending_hitl_count": len(pending),
@@ -46,7 +46,7 @@ async def deny_hitl(req: HITLDecisionRequest):
 
 @router.get("/quarantine")
 async def get_quarantined():
-    return {"quarantined_agents": loop_detector.get_quarantined_agents()}
+    return {"quarantined_agents": loop_detector.get_quarantined_agents_detailed()}
 
 @router.post("/quarantine/release")
 async def release_quarantine_agent(req: QuarantineReleaseRequest):

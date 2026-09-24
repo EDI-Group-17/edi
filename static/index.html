@@ -880,9 +880,12 @@
                     return;
                 }
                 container.innerHTML = agents.map(agent => `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
-                        <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">${escapeHTML(agent)}</span>
-                        <button class="btn btn-release" onclick="releaseQuarantine('${escapeHTML(agent)}')">Release</button>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: bold; color: var(--neon-red);">${escapeHTML(agent.agent_id)}</span>
+                            <span style="font-size: 11px; color: var(--text-muted);">Quarantined: <span style="color: var(--neon-amber);">${escapeHTML(agent.remaining_seconds)}s remaining</span></span>
+                        </div>
+                        <button class="btn btn-release" onclick="releaseQuarantine('${escapeHTML(agent.agent_id)}')">Release</button>
                     </div>
                 `).join('');
             } catch (err) {}
@@ -898,12 +901,13 @@
         }
 
 
+
         async function runLoopSpam() {
             const narrText = document.getElementById('narrativeText');
-            narrText.innerHTML = "<span style='color:var(--neon-red)'>🚨 INITIATING HALLUCINATION LOOP!</span> Firing 12 rapid redundant requests to simulate a runaway AI agent... Scroll down to the Real-Time Feed to watch the Quarantine trigger instantly!";
+            narrText.innerHTML = "<span style='color:var(--neon-red)'>🚨 INITIATING HALLUCINATION LOOP!</span> Firing 12 rapid redundant requests to simulate a runaway AI agent... Scroll down to the Real-Time Feed to watch the Quarantine trigger!";
             
             for(let i=1; i<=12; i++) {
-                fetch('/mcp/v1/proxy', {
+                await fetch('/mcp/v1/proxy', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-Agent-ID': 'runaway_agent_99' },
                     body: JSON.stringify({
@@ -913,8 +917,8 @@
                         params: { name: 'fetch_user_data', arguments: { user_id: 42 } }
                     })
                 }).catch(()=>{});
-                // 50ms delay
-                await new Promise(r => setTimeout(r, 50));
+                // Small delay to make the table update dramatically one by one
+                await new Promise(r => setTimeout(r, 300));
             }
         }
 
@@ -1167,7 +1171,7 @@
 
         connectWS();
         fetchMetrics();
-        setInterval(fetchMetrics, 5000);
+        setInterval(fetchMetrics, 1000);
     </script>
 </body>
 </html>

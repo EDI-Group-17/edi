@@ -69,6 +69,16 @@ class LoopDetector:
                 self._quarantined.pop(agent_id, None)
         return active
 
+    def get_quarantined_agents_detailed(self) -> List[Dict[str, Any]]:
+        now = time.time()
+        active = []
+        for agent_id, until in list(self._quarantined.items()):
+            if now < until:
+                active.append({"agent_id": agent_id, "remaining_seconds": int(until - now)})
+            else:
+                self._quarantined.pop(agent_id, None)
+        return active
+
     def release_quarantine(self, agent_id: str) -> bool:
         if agent_id in self._quarantined:
             self._quarantined.pop(agent_id, None)
