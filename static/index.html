@@ -659,6 +659,7 @@
             <div style="display: flex; gap: 8px;">
                 <input type="text" id="customInput" placeholder="Type a custom prompt (e.g. 'delete the database') or a tool name..." style="flex-grow: 1; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 13px;" onkeypress="if(event.key === 'Enter') runCustomDemo()">
                 <button class="btn btn-demo btn-purple" style="width: auto; padding: 12px 24px;" onclick="runCustomDemo()">FIRE PAYLOAD</button>
+                <button class="btn btn-demo btn-high" style="width: auto; padding: 12px 24px;" onclick="runLoopSpam()">⚡ SIMULATE HALLUCINATION LOOP</button>
             </div>
         </div>
 
@@ -894,6 +895,27 @@
                 body: JSON.stringify({ agent_id: agentId })
             });
             fetchMetrics();
+        }
+
+
+        async function runLoopSpam() {
+            const narrText = document.getElementById('narrativeText');
+            narrText.innerHTML = "<span style='color:var(--neon-red)'>🚨 INITIATING HALLUCINATION LOOP!</span> Firing 12 rapid redundant requests to simulate a runaway AI agent... Scroll down to the Real-Time Feed to watch the Quarantine trigger instantly!";
+            
+            for(let i=1; i<=12; i++) {
+                fetch('/mcp/v1/proxy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Agent-ID': 'runaway_agent_99' },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        id: 'loop-' + i,
+                        method: 'tools/call',
+                        params: { name: 'fetch_user_data', arguments: { user_id: 42 } }
+                    })
+                }).catch(()=>{});
+                // 50ms delay
+                await new Promise(r => setTimeout(r, 50));
+            }
         }
 
         function runCustomDemo() {
